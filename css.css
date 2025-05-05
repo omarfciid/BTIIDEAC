@@ -1,0 +1,6 @@
+chatbot-curso/
+│
+├── app.py                ← Código principal del chatbot
+├── requirements.txt      ← Dependencias
+├── .gitignore            ← Para ocultar credenciales
+├── credenciales.json     ← (Se genera en Google Cloud)
