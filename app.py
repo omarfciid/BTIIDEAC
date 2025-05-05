@@ -13,7 +13,7 @@ def conectar_sheets():
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('credenciales.json', scope)
     client = gspread.authorize(creds)
-    return client.open("Curso Chatbot")  # Nombre del documento de Google Sheets
+    return client.open("FAQS")  # Nombre del documento de Google Sheets
 
 # Obtener las preguntas frecuentes (FAQ) desde la hoja de Google Sheets
 def cargar_faq():
