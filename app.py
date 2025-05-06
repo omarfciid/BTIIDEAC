@@ -13,7 +13,7 @@ def conectar_sheets():
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('credenciales.json', scope)
     client = gspread.authorize(creds)
-    return client.open("FAQS")  # Cambia aquí si tu documento tiene otro nombre
+    return client.open("FAQ")  # Cambia aquí si tu documento tiene otro nombre
 
 # Obtener las preguntas frecuentes (FAQ) desde la hoja "FAQ"
 def cargar_faq():
@@ -27,7 +27,7 @@ def cargar_faq():
 
 # Interfaz de usuario con Streamlit
 def chatbot():
-    st.title("Chatbot del Curso")
+    st.title("Chatbot")
 
     nombre = st.text_input("¿Cuál es tu nombre?")
     curp = st.text_input("Introduce tu CURP:")
