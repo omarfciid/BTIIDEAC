@@ -22,7 +22,8 @@ def cargar_faq():
 def chatbot():
     st.title("Chatbot del Curso")
 
-    nombre = st.text_input("¿Cuál es tu nombre?")
+    nombre = st.text_input("¿Cuál es tu nombre completo?")
+    correo = st.text_input("¿Cuál es tu correo con el que te registraste?")
     pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
 
     if st.button('Preguntar'):
@@ -34,7 +35,7 @@ def chatbot():
         # Guardar datos del usuario en la hoja "Usuarios"
         documento = conectar_sheets()
         hoja_usuarios = documento.worksheet("Usuarios")
-        hoja_usuarios.append_row([nombre, pregunta, respuesta])
+        hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
 
 # Ejecutar la app
 if __name__ == '__main__':
