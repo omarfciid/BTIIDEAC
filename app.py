@@ -2,6 +2,7 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import re
+api_key = st.secrets["OPENAI_API_KEY"]
 
 # Función para validar CURP (expresión regular)
 def validar_curp(curp):
