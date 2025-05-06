@@ -20,7 +20,7 @@ def cargar_faq():
 
 # Interfaz del chatbot
 def chatbot():
-    st.title("Chatbot del Curso")
+    st.title("Curso DIAP")
 
     nombre = st.text_input("¿Cuál es tu nombre completo?")
     correo = st.text_input("¿Cuál es tu correo con el que te registraste?")
