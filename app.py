@@ -8,7 +8,7 @@ def conectar_sheets():
     creds_dict = st.secrets["gcp_service_account"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
-    return client.open("FAQ")  # Cambia aquí si el nombre del documento es diferente
+    return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit") # Cambia aquí si el nombre del documento es diferente
 
 # Cargar preguntas frecuentes desde la hoja "FAQ"
 def cargar_faq():
