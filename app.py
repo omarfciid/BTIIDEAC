@@ -29,7 +29,7 @@ def chatbot():
     st.title("Chatbot del Curso")
 
     nombre = st.text_input("¿Cuál es tu nombre?")
-    curp = st.text_input("Introduce tu CURP:")
+   # curp = st.text_input("Introduce tu CURP:")
     pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
 
     if st.button('Preguntar'):
