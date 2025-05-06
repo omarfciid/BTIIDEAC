@@ -4,9 +4,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 import re
 
 # Función para validar CURP
-def validar_curp(curp):
-    patron = r"^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$"
-    return re.match(patron, curp.upper()) is not None
+#def validar_curp(curp):
+ #   patron = r"^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$"
+  #  return re.match(patron, curp.upper()) is not None
 
 # Conexión a Google Sheets usando credenciales desde secrets.toml
 def conectar_sheets():
