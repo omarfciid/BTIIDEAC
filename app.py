@@ -24,23 +24,7 @@ def cargar_faq():
             if isinstance(pregunta, str) and isinstance(respuesta, str):
                 faq[pregunta.strip().lower()] = respuesta
     return faq
-
-
-pregunta_lower = pregunta.strip().lower()
-
-# Buscar la pregunta más similar
-preguntas_faq = list(faq_dict.keys())
-pregunta_similar = difflib.get_close_matches(pregunta_lower, preguntas_faq, n=1, cutoff=0.6)
-
-if pregunta_similar:
-    respuesta = faq_dict[pregunta_similar[0]]
-else:
-    respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
-
-
-
-
-
+    
 # Interfaz del chatbot
 def chatbot():
     st.title("Curso DIAP")
