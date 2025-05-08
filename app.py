@@ -18,7 +18,7 @@ def cargar_faq():
     data = hoja_faq.get_all_records()
     faq = {}
     for item in data:
-        if 'Pregunta' in item and 'Respuesta' in item:
+        if 'pregunta' in item and 'respuesta' in item:
             pregunta = item['pregunta']
             respuesta = item['respuesta']
             if isinstance(pregunta, str) and isinstance(respuesta, str):
