@@ -10,6 +10,7 @@ def conectar_sheets():
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
     return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+
 # Cargar preguntas frecuentes desde la hoja "FAQ"
 def cargar_faq():
     documento = conectar_sheets()
@@ -35,7 +36,15 @@ def chatbot():
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
         pregunta_lower = pregunta.strip().lower()
-        respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
+
+        # Buscar la pregunta más similar en las claves del FAQ usando difflib
+        coincidencias = difflib.get_close_matches(pregunta_lower, faq_dict.keys(), n=1, cutoff=0.7)
+
+        if coincidencias:
+            respuesta = faq_dict[coincidencias[0]]
+        else:
+            respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
+
         st.write(f"respuesta: {respuesta}")
 
         # Guardar datos del usuario en la hoja "Usuarios"
