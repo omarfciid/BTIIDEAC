@@ -1,11 +1,9 @@
+Chatbot 
+
 import streamlit as st
 import gspread
 import difflib
 from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
-
-# Cargar la hoja de FAQ desde el archivo cargado
-faq_data = pd.read_excel('/mnt/data/FAQ.xlsx', sheet_name='FAQ')
 
 # Conexión a Google Sheets usando credenciales desde secrets.toml
 def conectar_sheets():
@@ -17,12 +15,17 @@ def conectar_sheets():
 
 # Cargar preguntas frecuentes desde la hoja "FAQ"
 def cargar_faq():
-    faq_dict = {}
-    for _, row in faq_data.iterrows():
-        pregunta = row['pregunta'].strip().lower()
-        respuesta = row['respuesta']
-        faq_dict[pregunta] = respuesta
-    return faq_dict
+    documento = conectar_sheets()
+    hoja_faq = documento.worksheet("FAQ")
+    data = hoja_faq.get_all_records()
+    faq = {}
+    for item in data:
+        if 'pregunta' in item and 'respuesta' in item:
+            pregunta = item['pregunta']
+            respuesta = item['respuesta']
+            if isinstance(pregunta, str) and isinstance(respuesta, str):
+                faq[pregunta.strip().lower()] = respuesta
+    return faq
 
 # Interfaz del chatbot
 def chatbot():
@@ -35,15 +38,7 @@ def chatbot():
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
         pregunta_lower = pregunta.strip().lower()
-
-        # Buscar la pregunta más similar en las claves del FAQ usando difflib
-        coincidencias = difflib.get_close_matches(pregunta_lower, faq_dict.keys(), n=1, cutoff=0.7)
-
-        if coincidencias:
-            respuesta = faq_dict[coincidencias[0]]
-        else:
-            respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
-
+        respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
         st.write(f"respuesta: {respuesta}")
 
         # Guardar datos del usuario en la hoja "Usuarios"
