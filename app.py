@@ -1,5 +1,3 @@
-Mi siguiente código está así, pero me arroja un mensaje de que no se encontró la respuesta: Respuesta: No entiendo la pregunta. ¿Podrías reformularla?
-
 import streamlit as st
 import gspread
 import difflib
