@@ -15,7 +15,13 @@ def cargar_faq():
     documento = conectar_sheets()
     hoja_faq = documento.worksheet("FAQ")
     data = hoja_faq.get_all_records()
-    faq = {item['pregunta'].strip().lower(): item['respuesta'] for item in data}
+    faq = {}
+    for item in data:
+        if 'pregunta' in item and 'respuesta' in item:
+            pregunta = item['pregunta']
+            respuesta = item['respuesta']
+            if isinstance(pregunta, str) and isinstance(respuesta, str):
+                faq[pregunta.strip().lower()] = respuesta
     return faq
 
 # Interfaz del chatbot
