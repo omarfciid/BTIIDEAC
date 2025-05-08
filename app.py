@@ -18,9 +18,9 @@ def cargar_faq():
     data = hoja_faq.get_all_records()
     faq = {}
     for item in data:
-        if 'Pregunta' in item and 'Respuesta' in item:
-            pregunta = item['Pregunta']
-            respuesta = item['Respuesta']
+        if 'pregunta' in item and 'respuesta' in item:
+            pregunta = item['pregunta']
+            respuesta = item['respuesta']
             if isinstance(pregunta, str) and isinstance(respuesta, str):
                 faq[pregunta.strip().lower()] = respuesta
     return faq
@@ -36,15 +36,7 @@ def chatbot():
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
         pregunta_lower = pregunta.strip().lower()
-
-        # Buscar la pregunta más similar en las claves del FAQ usando difflib
-        coincidencias = difflib.get_close_matches(pregunta_lower, faq_dict.keys(), n=1, cutoff=0.7)
-
-        if coincidencias:
-            respuesta = faq_dict[coincidencias[0]]
-        else:
-            respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
-
+        respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
         st.write(f"respuesta: {respuesta}")
 
         # Guardar datos del usuario en la hoja "Usuarios"
