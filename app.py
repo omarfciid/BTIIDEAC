@@ -37,17 +37,23 @@ def chatbot():
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
         pregunta_lower = pregunta.strip().lower()
+        st.write("Pregunta ingresada (procesada):", pregunta_lower)
+
 
         # Buscar pregunta más similar usando difflib
         preguntas_faq = list(faq_dict.keys())
         pregunta_similar = difflib.get_close_matches(pregunta_lower, preguntas_faq, n=1, cutoff=0.6)
+        #pregunta_similar = difflib.get_close_matches(pregunta_lower, preguntas_faq, n=1, cutoff=0.6)
 
         if pregunta_similar:
             respuesta = faq_dict[pregunta_similar[0]]
         else:
             respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
 
-        st.write(f"Respuesta: {respuesta}")
+       # st.write(f"Respuesta: {respuesta}")
+
+        st.write("Preguntas disponibles:")
+        st.write(list(faq_dict.keys()))
 
         # Guardar datos del usuario en la hoja "Usuarios"
         documento = conectar_sheets()
