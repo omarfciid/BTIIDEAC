@@ -35,12 +35,15 @@ def chatbot():
 
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
-        
+
         # Imprimir las preguntas cargadas para depuración
-        st.write("Preguntas cargadas:")
+        st.write("Preguntas cargadas desde Google Sheets:")
         st.write(faq_dict)
 
         pregunta_lower = pregunta.strip().lower()
+
+        # Mostrar la pregunta ingresada por el usuario para depuración
+        st.write(f"Pregunta del usuario: {pregunta_lower}")
 
         # Buscar la pregunta más similar en las claves del FAQ usando difflib
         coincidencias = difflib.get_close_matches(pregunta_lower, faq_dict.keys(), n=1, cutoff=0.5)
