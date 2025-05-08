@@ -5,25 +5,39 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # Conexión a Google Sheets usando credenciales desde secrets.toml
 def conectar_sheets():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-    creds_dict = st.secrets["gcp_service_account"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-    client = gspread.authorize(creds)
-    return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+    try:
+        scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+        creds_dict = st.secrets["gcp_service_account"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        client = gspread.authorize(creds)
+        documento = client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+        return documento
+    except Exception as e:
+        st.write(f"Error al conectar con Google Sheets: {e}")
+        return None
 
 # Cargar preguntas frecuentes desde la hoja "FAQ"
 def cargar_faq():
     documento = conectar_sheets()
-    hoja_faq = documento.worksheet("FAQ")
-    data = hoja_faq.get_all_records()
-    faq = {}
-    for item in data:
-        if 'pregunta' in item and 'respuesta' in item:
-            pregunta = item['pregunta']
-            respuesta = item['respuesta']
-            if isinstance(pregunta, str) and isinstance(respuesta, str):
-                faq[pregunta.strip().lower()] = respuesta
-    return faq
+    if documento is None:
+        return {}
+
+    try:
+        hoja_faq = documento.worksheet("FAQ")
+        data = hoja_faq.get_all_records()
+        if not data:
+            st.write("No se encontraron registros en la hoja FAQ.")
+        faq = {}
+        for item in data:
+            if 'pregunta' in item and 'respuesta' in item:
+                pregunta = item['pregunta']
+                respuesta = item['respuesta']
+                if isinstance(pregunta, str) and isinstance(respuesta, str):
+                    faq[pregunta.strip().lower()] = respuesta
+        return faq
+    except Exception as e:
+        st.write(f"Error al cargar datos de la hoja FAQ: {e}")
+        return {}
 
 # Interfaz del chatbot
 def chatbot():
@@ -36,9 +50,12 @@ def chatbot():
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
 
-        # Imprimir las preguntas cargadas para depuración
-        st.write("Preguntas cargadas desde Google Sheets:")
-        st.write(faq_dict)
+        # Verificar si se cargaron las preguntas
+        if not faq_dict:
+            st.write("No se cargaron preguntas desde Google Sheets.")
+        else:
+            st.write("Preguntas cargadas desde Google Sheets:")
+            st.write(faq_dict)
 
         pregunta_lower = pregunta.strip().lower()
 
@@ -60,8 +77,9 @@ def chatbot():
 
         # Guardar datos del usuario en la hoja "Usuarios"
         documento = conectar_sheets()
-        hoja_usuarios = documento.worksheet("Usuarios")
-        hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
+        if documento:
+            hoja_usuarios = documento.worksheet("Usuarios")
+            hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
 
 # Ejecutar la app
 if __name__ == '__main__':
