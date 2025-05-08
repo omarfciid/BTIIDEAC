@@ -33,42 +33,16 @@ def chatbot():
     correo = st.text_input("¿Cuál es tu correo con el que te registraste?")
     pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
 
-if st.button('Preguntar'):
-    faq_dict = cargar_faq()
-    pregunta_lower = pregunta.strip().lower()
-
-    # Buscar pregunta similar usando difflib
-    preguntas_faq = list(faq_dict.keys())
-    pregunta_similar = difflib.get_close_matches(pregunta_lower, preguntas_faq, n=1, cutoff=0.6)
-
-    if pregunta_similar:
-        respuesta = faq_dict[pregunta_similar[0]]
-    else:
-        respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
-
-    st.write(f"Respuesta: {respuesta}")
-
-    # Guardar datos del usuario en la hoja "Usuarios"
-    documento = conectar_sheets()
-    hoja_usuarios = documento.worksheet("Usuarios")
-    hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
-
-
-
-
-
-
-    
-  #  if st.button('Preguntar'):
-  #      faq_dict = cargar_faq()
- #       pregunta_lower = pregunta.strip().lower()
-  #      respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
-#        st.write(f"Respuesta: {respuesta}")
+  if st.button('Preguntar'):
+      faq_dict = cargar_faq()
+        pregunta_lower = pregunta.strip().lower()
+       respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
+      st.write(f"Respuesta: {respuesta}")
 
         # Guardar datos del usuario en la hoja "Usuarios"
-  #      documento = conectar_sheets()
-    #    hoja_usuarios = documento.worksheet("Usuarios")
-   #     hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
+       documento = conectar_sheets()
+        hoja_usuarios = documento.worksheet("Usuarios")
+        hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
 
 # Ejecutar la app
 if __name__ == '__main__':
