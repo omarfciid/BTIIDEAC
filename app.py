@@ -35,8 +35,24 @@ def chatbot():
 
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
+        
+        # Imprimir las preguntas cargadas para depuración
+        st.write("Preguntas cargadas:")
+        st.write(faq_dict)
+
         pregunta_lower = pregunta.strip().lower()
-        respuesta = faq_dict.get(pregunta_lower, "No entiendo la pregunta. ¿Podrías reformularla?")
+
+        # Buscar la pregunta más similar en las claves del FAQ usando difflib
+        coincidencias = difflib.get_close_matches(pregunta_lower, faq_dict.keys(), n=1, cutoff=0.5)
+
+        # Imprimir las coincidencias encontradas para depuración
+        st.write(f"Coincidencias encontradas: {coincidencias}")
+
+        if coincidencias:
+            respuesta = faq_dict[coincidencias[0]]
+        else:
+            respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
+
         st.write(f"respuesta: {respuesta}")
 
         # Guardar datos del usuario en la hoja "Usuarios"
