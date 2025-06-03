@@ -7,7 +7,7 @@ import os
 
 # Configuración de Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-2.0.flash')
+model = genai.GenerativeModel('gemini-2.0-flash-exp')
 
 # Ruta del PDF con la información del curso (cambia esta ruta)
 PDF_PATH = "Respuesta.pdf"
