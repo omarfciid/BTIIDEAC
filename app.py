@@ -6,7 +6,7 @@ import google.generativeai as genai
 import os
 
 # ✅ Configuración de la página
-st.set_page_config(page_title="Asistente DIAP 🤖", page_icon="🤖")
+st.set_page_config(page_title="Asistente 🤖", page_icon="🤖")
 
 # 🔐 Configuración de Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
