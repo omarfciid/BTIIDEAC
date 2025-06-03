@@ -6,7 +6,7 @@ import google.generativeai as genai
 import os
 
 # ✅ Configuración de la página
-st.set_page_config(page_title="Bot Hidalgo 🤖", page_icon="🤖")
+st.set_page_config(page_title="Asistente DIAP 🤖", page_icon="🤖")
 
 # 🔐 Configuración de Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
@@ -36,5 +36,45 @@ def obtener_respuesta_gemini(pregunta):
     contexto = extraer_texto_pdf(PDF_PATH)
     
     prompt = f"""
-    Basado en el siguiente contexto sobr
+    Basado en el siguiente contexto sobre el Curso DIAP, responde la pregunta del usuario.
+    Si la pregunta no puede responderse con el contexto, indica que no tienes información suficiente.
 
+    Contexto:
+    {contexto}
+
+    Pregunta: {pregunta}
+    Respuesta:"""
+    
+    try:
+        respuesta = model.generate_content(prompt)
+        return respuesta.text
+    except Exception as e:
+        return f"Error al generar respuesta: {str(e)}"
+
+# 🗨️ Interfaz del chatbot
+def chatbot():
+    st.title("💬 Asistente del Curso DIAP")
+
+    nombre = st.text_input("🧑‍💼 ¿Cuál es tu nombre completo?")
+    correo = st.text_input("📧 ¿Cuál es tu correo de registro?")
+    pregunta = st.text_input("❓ ¿Qué te gustaría saber sobre el curso?")
+
+    if st.button('💡 Preguntar'):
+        if not pregunta:
+            st.warning("⚠️ Por favor ingresa una pregunta")
+            return
+            
+        respuesta = obtener_respuesta_gemini(pregunta)
+        st.write(f"🧠 Respuesta: {respuesta}")
+
+        try:
+            documento = conectar_sheets()
+            hoja_usuarios = documento.worksheet("Usuarios")
+            hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
+            st.success("✅ ¡Tu pregunta ha sido registrada!")
+        except Exception as e:
+            st.error(f"❌ Error al guardar en la hoja de cálculo: {str(e)}")
+
+# ▶️ Ejecutar app
+if __name__ == '__main__':
+    chatbot()
