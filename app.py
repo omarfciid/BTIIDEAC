@@ -2,46 +2,35 @@ import streamlit as st
 import gspread
 import difflib
 import unicodedata
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-# ----------------------------
-# FUNCIONES DE APOYO
-# ----------------------------
-st.write("🔍 Prueba: Spreadsheet URL =", st.secrets.get("spreadsheet_url", "NO DEFINIDO"))
-st.write("🔍 Prueba: Client Email =", st.secrets["gcp_service_account"].get("client_email", "NO DEFINIDO"))
-st.write("🔍 Prueba: Tiene clave privada =", "private_key" in st.secrets["gcp_service_account"])
-
+# Normaliza texto para comparación
 def normalizar(texto):
     texto = texto.lower().strip()
     texto = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("utf-8")
     return texto
 
-# Conexión con Google Sheets
+# Conexión a Google Sheets con google-auth
 def conectar_sheets():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     creds_dict = st.secrets["gcp_service_account"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     client = gspread.authorize(creds)
-    return client.open_by_url(st.secrets["https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit"])
+    return client.open_by_url(st.secrets["spreadsheet_url"])
 
-# Cargar preguntas y respuestas
+# Cargar FAQ
 def cargar_faq():
-    documento = conectar_sheets()
-    hoja_faq = documento.worksheet("FAQ")
-    data = hoja_faq.get_all_records()
+    hoja_faq = conectar_sheets().worksheet("FAQ")
+    datos = hoja_faq.get_all_records()
     faq = {}
-    for item in data:
-        if 'pregunta' in item and 'respuesta' in item:
-            pregunta = item['pregunta']
-            respuesta = item['respuesta']
-            if isinstance(pregunta, str) and isinstance(respuesta, str):
-                faq[pregunta.strip()] = respuesta
+    for fila in datos:
+        pregunta = fila.get("pregunta", "").strip()
+        respuesta = fila.get("respuesta", "").strip()
+        if pregunta and respuesta:
+            faq[pregunta] = respuesta
     return faq
 
-# ----------------------------
-# INTERFAZ DEL CHATBOT
-# ----------------------------
-
+# Chatbot principal
 def chatbot():
     st.title("🤖 Curso DIAP – Asistente Virtual")
 
@@ -49,11 +38,9 @@ def chatbot():
     correo = st.text_input("📧 ¿Cuál es tu correo con el que te registraste?")
     pregunta = st.text_input("❓ ¿Qué te gustaría saber sobre el curso?")
 
-    if st.button('Preguntar'):
+    if st.button("Preguntar"):
         faq_dict = cargar_faq()
-        pregunta_usuario = pregunta.strip()
-        pregunta_normalizada = normalizar(pregunta_usuario)
-
+        pregunta_normalizada = normalizar(pregunta)
         claves_originales = list(faq_dict.keys())
         claves_normalizadas = [normalizar(k) for k in claves_originales]
 
@@ -68,17 +55,11 @@ def chatbot():
 
         st.write(f"**💬 Respuesta:** {respuesta}")
 
-        # Guardar en hoja "Usuarios"
         try:
-            documento = conectar_sheets()
-            hoja_usuarios = documento.worksheet("Usuarios")
-            hoja_usuarios.append_row([nombre, correo, pregunta_usuario, respuesta])
+            hoja_usuarios = conectar_sheets().worksheet("Usuarios")
+            hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
         except Exception as e:
-            st.warning(f"No se pudo guardar la pregunta: {e}")
+            st.error(f"❗ Error al guardar en hoja de usuarios: {e}")
 
-# ----------------------------
-# INICIO
-# ----------------------------
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     chatbot()
