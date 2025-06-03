@@ -1,17 +1,27 @@
 import streamlit as st
 import gspread
 import difflib
+import unicodedata
 from oauth2client.service_account import ServiceAccountCredentials
 
-# Conexión a Google Sheets usando credenciales desde secrets.toml
+# ----------------------------
+# FUNCIONES DE APOYO
+# ----------------------------
+
+def normalizar(texto):
+    texto = texto.lower().strip()
+    texto = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("utf-8")
+    return texto
+
+# Conexión con Google Sheets
 def conectar_sheets():
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds_dict = st.secrets["gcp_service_account"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
-    return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+    return client.open_by_url(st.secrets["spreadsheet_url"])
 
-# Cargar preguntas frecuentes desde la hoja "FAQ"
+# Cargar preguntas y respuestas
 def cargar_faq():
     documento = conectar_sheets()
     hoja_faq = documento.worksheet("FAQ")
@@ -22,38 +32,50 @@ def cargar_faq():
             pregunta = item['pregunta']
             respuesta = item['respuesta']
             if isinstance(pregunta, str) and isinstance(respuesta, str):
-                faq[pregunta.strip().lower()] = respuesta
+                faq[pregunta.strip()] = respuesta
     return faq
 
-# Interfaz del chatbot
-def chatbot():
-    st.title("Curso DIAP")
+# ----------------------------
+# INTERFAZ DEL CHATBOT
+# ----------------------------
 
-    nombre = st.text_input("¿Cuál es tu nombre completo?")
-    correo = st.text_input("¿Cuál es tu correo con el que te registraste?")
-    pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
+def chatbot():
+    st.title("🤖 Curso DIAP – Asistente Virtual")
+
+    nombre = st.text_input("👤 ¿Cuál es tu nombre completo?")
+    correo = st.text_input("📧 ¿Cuál es tu correo con el que te registraste?")
+    pregunta = st.text_input("❓ ¿Qué te gustaría saber sobre el curso?")
 
     if st.button('Preguntar'):
         faq_dict = cargar_faq()
-        pregunta_normalizada = pregunta.strip().lower()
+        pregunta_usuario = pregunta.strip()
+        pregunta_normalizada = normalizar(pregunta_usuario)
 
-        # Buscar pregunta más parecida
-        posibles = list(faq_dict.keys())
-        coincidencias = difflib.get_close_matches(pregunta_normalizada, posibles, n=1, cutoff=0.6)
+        claves_originales = list(faq_dict.keys())
+        claves_normalizadas = [normalizar(k) for k in claves_originales]
+
+        coincidencias = difflib.get_close_matches(pregunta_normalizada, claves_normalizadas, n=1, cutoff=0.6)
 
         if coincidencias:
-            mejor_pregunta = coincidencias[0]
+            idx = claves_normalizadas.index(coincidencias[0])
+            mejor_pregunta = claves_originales[idx]
             respuesta = faq_dict[mejor_pregunta]
         else:
             respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
 
-        st.write(f"respuesta: {respuesta}")
+        st.write(f"**💬 Respuesta:** {respuesta}")
 
         # Guardar en hoja "Usuarios"
-        documento = conectar_sheets()
-        hoja_usuarios = documento.worksheet("Usuarios")
-        hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
+        try:
+            documento = conectar_sheets()
+            hoja_usuarios = documento.worksheet("Usuarios")
+            hoja_usuarios.append_row([nombre, correo, pregunta_usuario, respuesta])
+        except Exception as e:
+            st.warning(f"No se pudo guardar la pregunta: {e}")
 
-# Ejecutar la app
+# ----------------------------
+# INICIO
+# ----------------------------
+
 if __name__ == '__main__':
     chatbot()
