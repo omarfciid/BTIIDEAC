@@ -1,6 +1,6 @@
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 import PyPDF2
 import google.generativeai as genai
 import os
@@ -14,11 +14,11 @@ PDF_PATH = "Respuesta.pdf"
 
 # Conexión a Google Sheets (igual que antes)
 def conectar_sheets():
-    scope = ['https://spreadsheets.google.com/feed','https://www.googleapis.com/auth/drive']
-    creds_dict = st.secrets["gcp_service_account"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
     client = gspread.authorize(creds)
     return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+
 
 # Extraer texto del PDF
 def extraer_texto_pdf(ruta_pdf):
