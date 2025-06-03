@@ -34,26 +34,25 @@ def chatbot():
     pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
 
     if st.button('Preguntar'):
-    faq_dict = cargar_faq()
-    pregunta_normalizada = pregunta.strip().lower()
+        faq_dict = cargar_faq()
+        pregunta_normalizada = pregunta.strip().lower()
 
-    # Buscar pregunta más parecida
-    posibles = list(faq_dict.keys())
-    coincidencias = difflib.get_close_matches(pregunta_normalizada, posibles, n=1, cutoff=0.6)
+        # Buscar pregunta más parecida
+        posibles = list(faq_dict.keys())
+        coincidencias = difflib.get_close_matches(pregunta_normalizada, posibles, n=1, cutoff=0.6)
 
-    if coincidencias:
-        mejor_pregunta = coincidencias[0]
-        respuesta = faq_dict[mejor_pregunta]
-    else:
-        respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
+        if coincidencias:
+            mejor_pregunta = coincidencias[0]
+            respuesta = faq_dict[mejor_pregunta]
+        else:
+            respuesta = "No entiendo la pregunta. ¿Podrías reformularla?"
 
-    st.write(f"respuesta: {respuesta}")
+        st.write(f"respuesta: {respuesta}")
 
-    # Guardar en hoja "Usuarios"
-    documento = conectar_sheets()
-    hoja_usuarios = documento.worksheet("Usuarios")
-    hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
-
+        # Guardar en hoja "Usuarios"
+        documento = conectar_sheets()
+        hoja_usuarios = documento.worksheet("Usuarios")
+        hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
 
 # Ejecutar la app
 if __name__ == '__main__':
