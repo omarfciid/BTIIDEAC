@@ -14,7 +14,7 @@ genai.configure(api_key=st.secrets["gemini_api_key"])
 model = genai.GenerativeModel('gemini-pro')
 
 # Ruta fija al PDF (ajusta esta ruta)
-PDF_PATH = "./material_curso.pdf"  # O usa una ruta absoluta como "/home/usuario/documentos/curso.pdf"
+PDF_PATH = "./Respuesta.pdf"  # O usa una ruta absoluta como "/home/usuario/documentos/curso.pdf"
 
 # Conexión a Google Sheets
 def conectar_sheets():
