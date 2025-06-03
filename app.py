@@ -27,6 +27,19 @@ def cargar_faq():
 
 # Interfaz del chatbot
 def chatbot():
+    st.title("🤖 Chatbot FAQ IIDEAC")
+    pregunta_usuario = st.text_input("Haz tu pregunta:")
+
+    if pregunta_usuario:
+        faq_dict = cargar_faq()
+        
+        st.markdown("### Preguntas disponibles:")
+        st.write(list(faq_dict.keys()))  # Muestra todas las preguntas cargadas
+
+        respuesta = encontrar_respuesta(pregunta_usuario, faq_dict)
+        st.write("**Respuesta:**", respuesta)
+
+    
     st.title("Curso DIAP")
 
     nombre = st.text_input("¿Cuál es tu nombre completo?")
