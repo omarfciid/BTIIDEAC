@@ -36,7 +36,7 @@ def obtener_respuesta_gemini(pregunta):
     contexto = extraer_texto_pdf(PDF_PATH)
     
     prompt = f"""
-    Basado en el siguiente contexto sobre el Curso DIAP, responde la pregunta del usuario.
+    Basado en el siguiente contexto sobre el Curso, responde la pregunta del usuario.
     Si la pregunta no puede responderse con el contexto, indica que no tienes información suficiente.
 
     Contexto:
@@ -53,7 +53,7 @@ def obtener_respuesta_gemini(pregunta):
 
 # 🗨️ Interfaz del chatbot
 def chatbot():
-    st.title("💬 Asistente del Curso DIAP")
+    st.title("💬 Asistente del Curso")
 
     nombre = st.text_input("🧑‍💼 ¿Cuál es tu nombre completo?")
     correo = st.text_input("📧 ¿Cuál es tu correo de registro?")
