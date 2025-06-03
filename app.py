@@ -7,6 +7,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 # ----------------------------
 # FUNCIONES DE APOYO
 # ----------------------------
+st.write("🔍 Prueba: Spreadsheet URL =", st.secrets.get("spreadsheet_url", "NO DEFINIDO"))
+st.write("🔍 Prueba: Client Email =", st.secrets["gcp_service_account"].get("client_email", "NO DEFINIDO"))
+st.write("🔍 Prueba: Tiene clave privada =", "private_key" in st.secrets["gcp_service_account"])
 
 def normalizar(texto):
     texto = texto.lower().strip()
