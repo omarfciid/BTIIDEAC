@@ -11,12 +11,14 @@ def normalizar(texto):
     return texto
 
 # Conexión a Google Sheets con google-auth
+from google.oauth2.service_account import Credentials
+
 def conectar_sheets():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds_dict = st.secrets["gcp_service_account"]
-    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    creds = Credentials.from_service_account_file("credenciales.json", scopes=scope)
     client = gspread.authorize(creds)
-    return client.open_by_url(st.secrets["spreadsheet_url"])
+    return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
+
 
 # Cargar FAQ
 def cargar_faq():
