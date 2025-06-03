@@ -1,120 +1,84 @@
 import streamlit as st
 import gspread
-import PyPDF2
-import os
 from oauth2client.service_account import ServiceAccountCredentials
+import PyPDF2
 import google.generativeai as genai
-from datetime import datetime
+import os
 
-# Configuración inicial
-st.set_page_config(page_title="Chatbot del Curso DIAP", page_icon="🤖")
-
-# Configurar Gemini
-genai.configure(api_key=st.secrets["gemini_api_key"])
+# Configuración de Gemini
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-pro')
 
-# Ruta fija al PDF (ajusta esta ruta)
-PDF_PATH = "./Respuesta.pdf"  # O usa una ruta absoluta como "/home/usuario/documentos/curso.pdf"
+# Ruta del PDF con la información del curso (cambia esta ruta)
+PDF_PATH = "informacion_curso.pdf"
 
-# Conexión a Google Sheets
+# Conexión a Google Sheets (igual que antes)
 def conectar_sheets():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    scope = ['https://spreadsheets.google.com/feed','https://www.googleapis.com/auth/drive']
     creds_dict = st.secrets["gcp_service_account"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
-    return client.open_by_url(st.secrets["google_sheet_url"])
+    return client.open_by_url("https://docs.google.com/spreadsheets/d/17Ku7gM-a3yVj41BiW8qUB44_AG-qPO9i7CgOdadZ3GQ/edit")
 
-# Extraer texto de PDF
-def extraer_texto_pdf(pdf_path):
+# Extraer texto del PDF
+def extraer_texto_pdf(ruta_pdf):
     texto = ""
-    try:
-        with open(pdf_path, "rb") as pdf_file:
-            pdf_reader = PyPDF2.PdfReader(pdf_file)
-            for page in pdf_reader.pages:
-                texto += page.extract_text() + "\n"
-        return texto
-    except Exception as e:
-        st.error(f"Error al leer el PDF: {str(e)}")
-        return None
+    with open(ruta_pdf, 'rb') as archivo:
+        lector = PyPDF2.PdfReader(archivo)
+        for pagina in lector.pages:
+            texto += pagina.extract_text()
+    return texto
 
-# Generar respuesta con Gemini
-def generar_respuesta(pregunta, contexto_pdf):
+# Obtener respuesta de Gemini basada en el PDF
+def obtener_respuesta_gemini(pregunta):
+    # Extraer texto del PDF
+    contexto = extraer_texto_pdf(PDF_PATH)
+    
+    # Crear prompt para Gemini
     prompt = f"""
-    Eres un asistente del Curso DIAP. Responde la pregunta del estudiante basándote en la siguiente información del curso:
-    
-    Contexto del curso:
-    {contexto_pdf}
-    
-    Pregunta del estudiante: {pregunta}
-    
-    Proporciona una respuesta clara, concisa y útil. Si la pregunta no está relacionada con el curso, indícalo amablemente.
-    """
+    Basado en el siguiente contexto sobre el Curso DIAP, responde la pregunta del usuario.
+    Si la pregunta no puede responderse con el contexto, indica que no tienes información suficiente.
+
+    Contexto:
+    {contexto}
+
+    Pregunta: {pregunta}
+    Respuesta:"""
     
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        respuesta = model.generate_content(prompt)
+        return respuesta.text
     except Exception as e:
-        return f"Error al generar la respuesta: {str(e)}"
+        return f"Error al generar respuesta: {str(e)}"
 
-# Cargar el PDF al iniciar la app
-@st.cache_resource
-def cargar_contexto():
-    if os.path.exists(PDF_PATH):
-        return extraer_texto_pdf(PDF_PATH)
-    else:
-        st.error(f"No se encontró el PDF en la ubicación: {PDF_PATH}")
-        return None
+# Interfaz del chatbot
+def chatbot():
+    st.title("Curso DIAP - Chatbot con IA")
 
-# Interfaz principal
-def main():
-    st.title("🤖 Chatbot del Curso DIAP")
-    st.markdown("""
-    Bienvenido al asistente virtual del curso. Haz tus preguntas sobre el material del curso.
-    """)
-    
-    # Cargar contexto del PDF
-    if 'contexto_pdf' not in st.session_state:
-        contexto = cargar_contexto()
-        if contexto:
-            st.session_state['contexto_pdf'] = contexto
-            st.success("Documento del curso cargado correctamente")
-        else:
-            st.stop()  # Detener la ejecución si no hay PDF
-    
-    # Formulario de preguntas
-    with st.form("pregunta_form"):
-        nombre = st.text_input("Nombre completo")
-        correo = st.text_input("Correo electrónico")
-        pregunta = st.text_area("Tu pregunta sobre el curso")
+    nombre = st.text_input("¿Cuál es tu nombre completo?")
+    correo = st.text_input("¿Cuál es tu correo con el que te registraste?")
+    pregunta = st.text_input("¿Qué te gustaría saber sobre el curso?")
+
+    if st.button('Preguntar'):
+        if not pregunta:
+            st.warning("Por favor ingresa una pregunta")
+            return
+            
+        # Obtener respuesta de Gemini
+        respuesta = obtener_respuesta_gemini(pregunta)
         
-        submitted = st.form_submit_button("Enviar pregunta")
-        
-        if submitted:
-            if not pregunta:
-                st.warning("Por favor ingresa tu pregunta")
-            else:
-                with st.spinner("Buscando la mejor respuesta..."):
-                    respuesta = generar_respuesta(pregunta, st.session_state['contexto_pdf'])
-                    
-                    # Mostrar respuesta
-                    st.subheader("Respuesta")
-                    st.markdown(respuesta)
-                    
-                    # Guardar en Google Sheets
-                    if nombre and correo:
-                        try:
-                            doc = conectar_sheets()
-                            hoja = doc.worksheet("Interacciones")
-                            hoja.append_row([
-                                nombre, 
-                                correo, 
-                                pregunta, 
-                                respuesta,
-                                str(datetime.now())
-                            ])
-                            st.success("Tu consulta ha sido registrada")
-                        except Exception as e:
-                            st.error(f"Error al guardar: {str(e)}")
+        # Mostrar respuesta
+        st.write(f"Respuesta: {respuesta}")
 
-if __name__ == "__main__":
-    main()
+        # Guardar datos del usuario en Google Sheets
+        try:
+            documento = conectar_sheets()
+            hoja_usuarios = documento.worksheet("Usuarios")
+            hoja_usuarios.append_row([nombre, correo, pregunta, respuesta])
+            st.success("¡Tu pregunta ha sido registrada!")
+        except Exception as e:
+            st.error(f"Error al guardar en la hoja de cálculo: {str(e)}")
+
+# Ejecutar la app
+if __name__ == '__main__':
+    chatbot()
