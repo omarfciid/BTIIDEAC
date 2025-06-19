@@ -53,7 +53,7 @@ def obtener_respuesta_gemini(pregunta):
 
 # 🗨️ Interfaz del chatbot
 def chatbot():
-    st.title("💬 Asistente del Curso")
+    st.title("💬 Asistente del Curso Convierte a tus alumnos en Booktubers")
 
     nombre = st.text_input("🧑‍💼 ¿Cuál es tu nombre completo?")
     correo = st.text_input("📧 ¿Cuál es tu correo de registro?")
