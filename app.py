@@ -53,22 +53,20 @@ def obtener_respuesta_gemini(pregunta):
 
 # 🗨️ Interfaz del chatbot
 def chatbot():
-   
     st.title("💬 Asistente del Curso Convierte a tus alumnos en Booktubers")
 
-    st.markdown("""
-    ---
+    # 🔔 Mensaje de advertencia e instrucciones
+    st.info("""
     🔔 **Recomendaciones para usar el asistente correctamente**  
+
     Para obtener mejores resultados al interactuar con el bot de respuestas, les pedimos tener en cuenta las siguientes recomendaciones:
 
-    * Sean claros y específicos con la pregunta que formulan. Esto facilitará que el bot les brinde una respuesta precisa y útil.  
-    * Eviten enviar muchas preguntas al mismo tiempo. El sistema tiene un límite de consultas por minuto. Si realizan más de 10 preguntas en un minuto, a partir de la número 11 recibirán el siguiente mensaje automático:  
-    **"Error al generar respuesta"**
-
-    Para evitarlo, les sugerimos espaciar sus preguntas y usar el bot de manera pausada.
+    * Sean claros y específicos con la pregunta que formulan.  
+    * Eviten enviar muchas preguntas al mismo tiempo. El sistema tiene un límite de consultas por minuto.  
+      Si realizan más de 10 preguntas en un minuto, a partir de la número 11 recibirán el mensaje automático:  
+      **"Error al generar respuesta"**
 
     🙏 ¡Gracias por su comprensión y por hacer un uso responsable de esta herramienta!
-    ---
     """)
 
     nombre = st.text_input("🧑‍💼 ¿Cuál es tu nombre completo?")
@@ -90,6 +88,7 @@ def chatbot():
             st.success("✅ ¡Tu pregunta ha sido registrada!")
         except Exception as e:
             st.error(f"❌ Error al guardar en la hoja de cálculo: {str(e)}")
+
 # ▶️ Ejecutar app
 if __name__ == '__main__':
     chatbot()
