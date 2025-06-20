@@ -59,7 +59,7 @@ def chatbot():
     st.info("""
     🔔 **Recomendaciones para usar el asistente correctamente**  
 
-    Para obtener mejores resultados al interactuar con el bot de respuestas, les pedimos tener en cuenta las siguientes recomendaciones:
+    Para obtener mejores resultados al interactuar con el asistente de respuestas, les pedimos tener en cuenta las siguientes recomendaciones:
 
     * Sean claros y específicos con la pregunta que formulan.  
     * Eviten enviar muchas preguntas al mismo tiempo. El sistema tiene un límite de consultas por minuto. Si realizan más de 10 preguntas en un minuto, a partir de la número 11 recibirán el mensaje automático: **"Error al generar respuesta"**
