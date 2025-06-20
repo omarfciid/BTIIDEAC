@@ -62,9 +62,7 @@ def chatbot():
     Para obtener mejores resultados al interactuar con el bot de respuestas, les pedimos tener en cuenta las siguientes recomendaciones:
 
     * Sean claros y específicos con la pregunta que formulan.  
-    * Eviten enviar muchas preguntas al mismo tiempo. El sistema tiene un límite de consultas por minuto.  
-      Si realizan más de 10 preguntas en un minuto, a partir de la número 11 recibirán el mensaje automático:  
-      **"Error al generar respuesta"**
+    * Eviten enviar muchas preguntas al mismo tiempo. El sistema tiene un límite de consultas por minuto. Si realizan más de 10 preguntas en un minuto, a partir de la número 11 recibirán el mensaje automático: **"Error al generar respuesta"**
 
     🙏 ¡Gracias por su comprensión y por hacer un uso responsable de esta herramienta!
     """)
